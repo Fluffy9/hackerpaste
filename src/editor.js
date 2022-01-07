@@ -18,11 +18,11 @@ import { generateEmbed, generateSnapshotUrl, generatePersistentUrl }
        from './links.js';
 
 import 'codemirror/lib/codemirror.css';
-import 'slim-select/dist/slimselect.min.css';
+// import 'slim-select/dist/slimselect.min.css';
 import 'codemirror/addon/scroll/simplescrollbars.css';
 import 'codemirror/theme/dracula.css';
 
-import 'codemirror/addon/mode/loadmode';
+//import 'codemirror/addon/mode/loadmode';
 import 'codemirror/addon/mode/overlay';
 import 'codemirror/addon/mode/multiplex';
 import 'codemirror/addon/mode/simple';

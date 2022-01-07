@@ -1,11 +1,11 @@
 /*jshint esversion: 8 */
 
-import { MySky } from './mysky';
+import { MySky, encryptObject, decryptObject } from './mysky';
 import MicroModal from 'micromodal';
 import { loadMyPastes, myPastes }
        from './editor.js';
-import { encryptObject, decryptObject }
-       from './encryption.js';
+// import { encryptObject, decryptObject }
+//        from './encryption.js';
 import { byId, clickListener, deleteClickListener }
        from './interface.js';
 import { generateDocKey, getPubkeyBasedRetrievalString }
@@ -33,13 +33,14 @@ const switchToLoggedIn = (message) => {
         byId("button-username").setAttribute('data-microtip-size', 'fit');
         skyid.getJSON('hackerpaste:my-pastes', (response3) => {
           if (response3["entry"] !== null) {
-            //myPastes = decryptObject(response3, skyid.seed);
-            let myPastes = response3["entry"]
+            console.log(myPastes)
+            debugger
+            myPastes = decryptObject(response3, skyid.seed);
             deleteClickListener("button-username", startSkyIDSession);
             clickListener("button-username", loadMyPastes);
             MicroModal.close('app-modal');
           } else {
-            let defaultContent = {documents:[{label: "Note to Self", docID:Math.random()*1000}]}
+            let defaultContent = {documents:[{label: "Note to Self", docID: "noteToSelf"}]}
             skyid.setJSON('hackerpaste:my-pastes',
               defaultContent, () => location.reload());
           }

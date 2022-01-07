@@ -1,5 +1,5 @@
 
-import { SkynetClient, Permission, PermCategory, PermType } from "skynet-js";
+import { SkynetClient, Permission, PermCategory, PermType, CustomGetJSONOptions } from "skynet-js";
 import { UserProfileDAC } from "@skynethub/userprofile-library";
 const userProfile = new UserProfileDAC();
 const portal = window.location.hostname === 'localhost' ? "https://siasky.net" : undefined;
@@ -15,6 +15,7 @@ export class MySky {
         this.skynetClient["registry"]["getEntry"] = async function(path, callback){
             this.getJSON(path, callback)
         }
+
         this.skynetClient["registry"]["getFileContent"] = function(skylink){
             // convert the file to a dataURL, save it as encrypted json
             return new Promise((resolve, reject) => {
@@ -24,6 +25,7 @@ export class MySky {
                 })
             })
         }
+
         this.skynetClient.uploadFile = function(blob) {
             // convert the file to a dataURL, save it as encrypted json
             return new Promise((resolve, reject) => {
@@ -55,8 +57,9 @@ export class MySky {
         window._loggedIn = loggedIn
         if(loggedIn){
             let userID = await mysky.userID()
-            window._userID = userID
-            this.seed = window["_userID"]
+            window._userID = userID 
+            this.seed = userID + "_" + await mysky.getEncryptedPathSeed(_reqDomain + "/", true)
+            //this.seed = window["_userID"]
             this.start("login_success")
         }
     }
@@ -100,4 +103,47 @@ export class MySky {
         callback({entry: prof[path] ? {data: prof[path]} : null})
     }
     hideOverlay(){}
+}
+
+/**
+ * Intentionally does nothing because we're using mysky encryption now
+ * @param {*} data the data
+ * @param {*} docKey unused
+ * @returns the data
+ */
+
+export const encryptData = (data, docKey) => {
+    return data
+}
+/**
+ * Retrieves the data and decrypts it. Assumes the docKey is the mysky.seed
+ * @param {*} data unused
+ * @param {MySky.seed} docKey a combination of mysky userID and mysky.getEncryptedPathSeed seperated by "_"
+ */
+export const decryptData = (data, docKey) => {
+    let userID = docKey.substring(0, docKey.indexOf("_"));
+    let seed = docKey.substring(docKey.indexOf("_"));
+    client.file.getJSONEncrypted(userID, seed);
+}
+
+/**
+ * Helper function to be used with encryptData. Also does nothing
+ * @param {*} data 
+ * @param {*} seed 
+ * @returns 
+ */
+export const encryptObject = (data, seed) => {
+    data = JSON.stringify(data);
+    let encryptedData = encryptData(data, seed);
+    data = {encrypted:encryptedData.toString()};
+    return data;
+};
+
+/**
+ * Helper function to decrypt data
+ * @param {*} data unused
+ * @param {MySky.seed} docKey a combination of mysky userID and mysky.getEncryptedPathSeed seperated by "_"
+ */
+export const decryptObject = (data, seed) => {
+    decryptData(data.encrypted, seed);
 }
