@@ -25,20 +25,27 @@ export class MySky {
                 })
             })
         }
-
+        /**
+         * Weirdly there doesn't seem to be a uploadFileEncrypted method. 
+         * Instead I'll save the file as encrypted json I guess lol
+         */
         this.skynetClient.uploadFile = function(blob) {
             // convert the file to a dataURL, save it as encrypted json
             return new Promise((resolve, reject) => {
-                _mysky.getJSONEncrypted("blobs.json").then((json) => {
-                    let data = new FileReader()
-                    data.onload = function(url){
-                        json.blobs.push(url)
-                        console.log(json.blobs)
-                        _mysky.setJSONEncrypted("blobs.json", json).then((result) => {
-                            resolve({skylink: "sia:" + json.blobs.length})
+                debugger
+                _mysky.getJSONEncrypted(_reqDomain + "/blobs.json").then((json) => {
+                    let reader = new FileReader()
+                    reader.onload = function(url){
+                        json.data = json.data["data"] ? json.data.data : json.data
+                        json.data = json.data ? json.data : []
+                        json.data[json.data.length] = (reader.result["data"])
+                        console.log(json.data)
+                        _mysky.setJSONEncrypted(_reqDomain + "/blobs.json", json).then((result) => {
+                            debugger
+                            resolve({skylink: "sia:" + json.data.length})
                         })
                     } 
-                    data.readAsDataURL(blob);
+                    reader.readAsDataURL(blob);
                 })
             })
         }
@@ -59,7 +66,6 @@ export class MySky {
             let userID = await mysky.userID()
             window._userID = userID 
             this.seed = userID + "_" + await mysky.getEncryptedPathSeed(_reqDomain + "/", true)
-            //this.seed = window["_userID"]
             this.start("login_success")
         }
     }
@@ -78,6 +84,7 @@ export class MySky {
     }
     // Set json as encrypted, call the callback
     async setJSON(path, json, callback){
+        debugger
         path = path.replace(":", "-")
         await _mysky.setJSONEncrypted(_reqDomain + "/" + path + ".json", {[path]: json})
         callback()
@@ -86,7 +93,7 @@ export class MySky {
     async getJSON(path, callback){
         path = path.replace(":", "-")
         let result = await _mysky.getJSONEncrypted(_reqDomain + "/" + path + ".json")
-        callback({entry: result["data"] ? {data: result.data[path], datalink: result.datalink} : null})
+        callback({entry: result["data"] ? {data: result.data[path], datalink: result["datalink"]} : null})
     }
     // Should set the user's MySky profile, but not sure if this is really necessary
     async setRegistry(path, json, callback) { 
@@ -121,8 +128,8 @@ export const encryptData = (data, docKey) => {
  * @param {MySky.seed} docKey a combination of mysky userID and mysky.getEncryptedPathSeed seperated by "_"
  */
 export const decryptData = (data, docKey) => {
-    let userID = docKey.substring(0, docKey.indexOf("_"));
-    let seed = docKey.substring(docKey.indexOf("_"));
+    let userID = docKey.substring(0, docKey.indexOf("skyseed:"));
+    let seed = docKey.substring(docKey.indexOf("skyseed:")+1);
     client.file.getJSONEncrypted(userID, seed);
 }
 

@@ -4,19 +4,23 @@ import { skyid, pubkey }
 	   from './account.js';
 import { editor, docLabel, persistentDocKey, myPastes, updateMyPastes, select }
        from './editor.js';
+// import { encryptData, decryptObject }
+//        from './encryption.js';
 import { encryptData, decryptObject }
-       from './encryption.js';
+        from './mysky.js';
+
 import { showCopyBar }
        from './interface.js';
 import { shorten, generateDocKey, generateUuid, getPubkeyBasedRetrievalString }
        from './utility.js';
 
 const generateLink = (mode) => {
+  debugger
   let docKey;
   let retrievalString;
   if (mode === 'mypastes') {
     docKey = persistentDocKey || generateDocKey();
-    persistentDocKey = docKey;
+    //persistentDocKey = docKey;
   } else {
     docKey = generateDocKey();
   }
@@ -42,15 +46,15 @@ const generateLink = (mode) => {
       if (mode === 'mypastes') {
         skyid.getJSON('hackerpaste:my-pastes', (response3) => {
           if (response3 !== null) {
-            myPastes = decryptObject(response3, skyid.seed);
-            myPastes = JSON.parse(myPastes);
-            console.log(myPastes);
+            let pastes = decryptObject(response3, skyid.seed);
+            pastes = JSON.parse(pastes);
+            console.log(pastes);
             postFileToRegistry(result.skylink, docKey, url);
             var docID = retrievalString + docKey;
             var docFound = false;
-            for (let i = 0; i < myPastes.documents.length; i++) {
-              if (myPastes.documents[i].docID == docID) {
-                docLabel = myPastes.documents[i].label;
+            for (let i = 0; i < pastes.documents.length; i++) {
+              if (pastes.documents[i].docID == docID) {
+                docLabel = pastes.documents[i].label;
                 docFound = true;
               }
             };

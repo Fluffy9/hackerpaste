@@ -6,8 +6,9 @@ import marked from 'marked';
 
 import { skyid, pubkey, startSkyIDSession, switchToLoggedOut }
        from './account.js';
-import { decryptData, encryptObject }
-       from './encryption.js';
+import { decryptData, encryptObject } from './mysky.js';
+// import { decryptData, encryptObject }
+//        from './encryption.js';
 import { byId, byClass, hideCopyBar, hideCopyBarNow, clickListener}
        from './interface.js';
 import { buildUrl }
@@ -18,11 +19,11 @@ import { generateEmbed, generateSnapshotUrl, generatePersistentUrl }
        from './links.js';
 
 import 'codemirror/lib/codemirror.css';
-// import 'slim-select/dist/slimselect.min.css';
+//import 'slim-select/dist/slimselect.min.css';
 import 'codemirror/addon/scroll/simplescrollbars.css';
 import 'codemirror/theme/dracula.css';
 
-//import 'codemirror/addon/mode/loadmode';
+import 'codemirror/addon/mode/loadmode';
 import 'codemirror/addon/mode/overlay';
 import 'codemirror/addon/mode/multiplex';
 import 'codemirror/addon/mode/simple';
